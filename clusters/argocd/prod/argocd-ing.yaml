@@ -10,4 +10,4 @@ spec:
           - path: /
             backend:
               serviceName: argocd-server
-              servicePort: http
+              servicePort: https
