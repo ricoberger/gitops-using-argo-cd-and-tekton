@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: argo-cd-ui
+spec:
+  rules:
+    - host: argocd-prod.fake
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: argocd-server
+              servicePort: https
+  tls:
+    - hosts:
+        - argocd-prod.fake
+      secretName: argocd-secret
