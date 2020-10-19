@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: argo-cd-ui
-  namespace: argocd
 spec:
   rules:
     - host: argocd-prod.fake
