@@ -10,4 +10,8 @@ spec:
           - path: /
             backend:
               serviceName: argocd-server
-              servicePort: https
+              servicePort: http
+  tls:
+    - hosts:
+        - argocd-prod.fake
+      secretName: argocd-secret
