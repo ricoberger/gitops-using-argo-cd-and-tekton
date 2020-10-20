@@ -7,6 +7,5 @@ resources:
   - flux-helm-operator-clusterrolebinding.yaml
   - flux-helm-operator-deploy.yaml
   - flux-helm-operator-sa.yaml
-  - flux-helm-operator-sm.yaml
   - flux-helm-operator-svc.yaml
   - flux-helm-release-crd.yaml

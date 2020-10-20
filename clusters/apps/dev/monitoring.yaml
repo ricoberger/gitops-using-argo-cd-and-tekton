@@ -18,4 +18,3 @@ spec:
     repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
     targetRevision: dev
     path: clusters/monitoring/dev
-

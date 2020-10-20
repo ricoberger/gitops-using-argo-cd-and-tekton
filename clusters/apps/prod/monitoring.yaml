@@ -16,5 +16,5 @@ spec:
       selfHeal: true
   source:
     repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
-    targetRevision: dev
+    targetRevision: HEAD
     path: clusters/monitoring/prod
