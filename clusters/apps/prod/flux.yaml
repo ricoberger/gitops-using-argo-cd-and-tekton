@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: flux
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,12 +9,13 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: flux
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
   source:
     repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
-    targetRevision: HEAD
-    path: clusters/argocd/prod
+    targetRevision: dev
+    path: clusters/flux/base
+

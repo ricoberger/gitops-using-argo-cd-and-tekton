@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: argocd
 resources:
   - monitoring-ns.yaml
+  - prometheus-operator-helm.yaml
