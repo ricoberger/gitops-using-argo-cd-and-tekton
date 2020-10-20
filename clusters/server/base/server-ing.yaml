@@ -1,0 +1,7 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: server
+  namespace: server
+  annotations:
+    kubernetes.io/ingress.class: nginx

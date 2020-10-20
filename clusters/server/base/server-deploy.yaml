@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          # image: <KUSTOMIZE>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /health
+            initialDelaySeconds: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health
+            initialDelaySeconds: 1
+            timeoutSeconds: 5
