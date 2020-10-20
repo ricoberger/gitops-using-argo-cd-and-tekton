@@ -16,11 +16,6 @@ spec:
         app: flux-helm-operator
     spec:
       serviceAccountName: flux-helm-operator
-      volumes:
-        - name: git-key
-          secret:
-            secretName: flux-git-deploy
-            defaultMode: 0400
       containers:
         - name: flux-helm-operator
           image: docker.io/fluxcd/helm-operator:1.2.0
@@ -40,9 +35,6 @@ spec:
               path: /healthz
             initialDelaySeconds: 1
             timeoutSeconds: 5
-          volumeMounts:
-            - name: git-key
-              mountPath: /etc/fluxd/ssh
           args:
             - --enabled-helm-versions=v3
             - --log-format=json
@@ -52,11 +44,3 @@ spec:
             - --update-chart-deps=true
             - --log-release-diffs=false
             - --workers=5
-            - --tiller-namespace=kube-system
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 2560Mi
-            requests:
-              cpu: 700m
-              memory: 1536Mi
