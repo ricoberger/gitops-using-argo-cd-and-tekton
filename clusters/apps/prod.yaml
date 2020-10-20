@@ -7,17 +7,14 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-
-  source:
-    repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
-    targetRevision: HEAD
-    path: clusters/apps/prod
-
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+  source:
+    repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
+    targetRevision: HEAD
+    path: clusters/apps/prod

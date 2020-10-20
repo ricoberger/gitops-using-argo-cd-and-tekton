@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flux
+resources:
+  - flux-ns.yaml
+  - flux-helm-operator-clusterrole.yaml
+  - flux-helm-operator-clusterrolebinding.yaml
+  - flux-helm-operator-deploy.yaml
+  - flux-helm-operator-sa.yaml
+  - flux-helm-operator-svc.yaml
+  - flux-helm-release-crd.yaml

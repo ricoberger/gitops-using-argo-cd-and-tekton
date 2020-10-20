@@ -1,0 +1,21 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-operator
+  namespace: monitoring
+spec:
+  releaseName: prometheus-operator
+  chart:
+    repository: https://prometheus-community.github.io/helm-charts
+    name: kube-prometheus-stack
+    version: 10.1.0
+  helmVersion: v3
+  values:
+    grafana:
+      ingress:
+        hosts:
+          - grafana-dev.fake
+    prometheus:
+      ingress:
+        hosts:
+          - prometheus-dev.fake
