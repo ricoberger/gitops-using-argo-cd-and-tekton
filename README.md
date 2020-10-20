@@ -49,10 +49,18 @@ kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut
 
 In the UI of Argo CD we can now see all deployed applications:
 
-TODO: Screenshot
+![Argo CD](./assets/argocd.png)
 
 This example also deploys the Prometheus Stack via the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart. We are using the [Flux Helm Operator](https://docs.fluxcd.io/projects/helm-operator/en/stable/) instead of the Argo CD to deploy the Helm chart. When the Helm chart was successfully synced Prometheus is available at [prometheus-dev.fake](https://prometheus-dev.fake) and Grafana at [grafana-dev.fake](https://grafana-dev.fake).
 
 In the next step we can login to Grafana with the `admin` user and the password `admin`. Then we can import the example Dashboard for Argo CD. The dashboard can be found in the GitHub repository of the Argo CD project at [https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json](https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json).
 
-TODO: Screenshot
+![Grafana](./assets/grafana.png)
+
+> **NOTE:** To deploy Tekton using Argo CD we had slightly adjusted the following files:
+>
+> - [tekton-dashboard-release.yaml](https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml)
+> - [tekton-pipeline-release.yaml](https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml)
+> - [tekton-triggers-release.yaml](https://github.com/tektoncd/dashboard/releases/latest/download/tekton-dashboard-release.yaml)
+>
+> We had to remove the `preserveUnknownFields` field from all CRDs and we had to change the `app.kubernetes.io/instance` label from `default` to `tekton` for all manifests.
