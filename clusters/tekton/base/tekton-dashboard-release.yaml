@@ -30,7 +30,6 @@ spec:
     shortNames:
     - ext
     - exts
-  preserveUnknownFields: false
   scope: Namespaced
   subresources:
     status: {}
