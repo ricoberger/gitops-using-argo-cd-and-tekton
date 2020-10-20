@@ -5,7 +5,7 @@ This repository demonstrates the GitOps workflow using [Argo CD](https://argopro
 In the first step we are creating a new Kubernetes cluster using Minikube and we enable the NGINX Ingress controller:
 
 ```sh
-minikube start --driver=virtualbox --profile=dev
+minikube start --driver=virtualbox --cpus=4 --memory=8192m --profile=dev
 minikube addons enable ingress --profile=dev
 ```
 
@@ -53,6 +53,6 @@ TODO: Screenshot
 
 This example also deploys the Prometheus Stack via the [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart. We are using the [Flux Helm Operator](https://docs.fluxcd.io/projects/helm-operator/en/stable/) instead of the Argo CD to deploy the Helm chart. When the Helm chart was successfully synced Prometheus is available at [prometheus-dev.fake](https://prometheus-dev.fake) and Grafana at [grafana-dev.fake](https://grafana-dev.fake).
 
-We can also import the example Dashboard for Argo CD. The dashboard can be found in the GitHub repository of the Argo CD project at [https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json](https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json).
+In the next step we can login to Grafana with the `admin` user and the password `admin`. Then we can import the example Dashboard for Argo CD. The dashboard can be found in the GitHub repository of the Argo CD project at [https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json](https://github.com/argoproj/argo-cd/blob/master/examples/dashboard.json).
 
 TODO: Screenshot
