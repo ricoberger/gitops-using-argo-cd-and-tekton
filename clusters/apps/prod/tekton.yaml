@@ -17,4 +17,4 @@ spec:
   source:
     repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
     targetRevision: HEAD
-    path: clusters/tekton/base
+    path: clusters/tekton/prod
