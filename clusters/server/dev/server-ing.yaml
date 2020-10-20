@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: server
+  namespace: server
+spec:
+  rules:
+    - host: server-dev.fake
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: server
+              servicePort: http

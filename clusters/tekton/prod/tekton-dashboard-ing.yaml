@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tekton-dashboard
+  namespace: tekton-pipelines
+spec:
+  rules:
+    - host: tekton-prod.fake
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: tekton-dashboard
+              servicePort: http
