@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: monitoring
+  name: server
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -9,7 +9,7 @@ spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring
+    namespace: server
   syncPolicy:
     automated:
       prune: true
@@ -17,4 +17,4 @@ spec:
   source:
     repoURL: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton.git
     targetRevision: HEAD
-    path: clusters/monitoring/prod
+    path: clusters/server/prod
