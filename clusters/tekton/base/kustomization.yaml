@@ -5,3 +5,9 @@ resources:
   - tekton-triggers-release.yaml
   - tekton-dashboard-release.yaml
   - tekton-dashboard-ing.yaml
+  - https://raw.githubusercontent.com/tektoncd/catalog/master/task/kaniko/0.1/kaniko.yaml
+  - pipeline-task-git-clone.yaml
+  - pipeline-task-update-image.yaml
+  - pipeline.yaml
+  - pipeline-sa.yaml
+  - pipeline-pvc.yaml

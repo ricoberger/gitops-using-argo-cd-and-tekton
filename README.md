@@ -2,6 +2,8 @@
 
 This repository demonstrates the GitOps workflow using [Argo CD](https://argoproj.github.io/projects/argo-cd) and [Tekton](https://tekton.dev). Argo CD is used to deploy our manifests to a Kubernetes cluster and Tekton is used for our CI/CD pipeline to build and update our applications.
 
+## Argo CD
+
 In the first step we are creating a new Kubernetes cluster using Minikube and we enable the NGINX Ingress controller:
 
 ```sh
@@ -57,6 +59,8 @@ In the next step we can login to Grafana with the `admin` user and the password 
 
 ![Grafana](./assets/grafana.png)
 
+## Tekton
+
 > **NOTE:** To deploy Tekton using Argo CD we had slightly adjusted the following files:
 >
 > - [tekton-dashboard-release.yaml](https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml)
@@ -64,3 +68,74 @@ In the next step we can login to Grafana with the `admin` user and the password 
 > - [tekton-triggers-release.yaml](https://github.com/tektoncd/dashboard/releases/latest/download/tekton-dashboard-release.yaml)
 >
 > We had to remove the `preserveUnknownFields` field from all CRDs and we had to change the `app.kubernetes.io/instance` label from `default` to `tekton` for all manifests.
+
+```sh
+kubectl create secret docker-registry docker-registry-secret --docker-server="https://index.docker.io/v1/" --docker-username=<DOCKER_USERNAME> --docker-password=<DOCKER_PASSWORD>
+kubectl annotate secret docker-registry-secret tekton.dev/docker-0=https://index.docker.io/v1/
+kubectl create secret generic github-secret --type="kubernetes.io/basic-auth" --from-literal=username=<GITHUB_USERNAME> --from-literal=password=<GITHUB_PASSWORD>
+kubectl annotate secret github-secret tekton.dev/git-0=https://github.com
+```
+
+```sh
+cat <<EOF | kubectl create -f -
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-and-deploy-dev-1
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  params:
+    - name: gitUrl
+      value: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton
+    - name: gitRevision
+      value: dev
+    - name: imageUrl
+      value: ricoberger/gitops-using-argo-cd-and-tekton
+    - name: imageTag
+      value: dev
+    - name: serviceName
+      value: server
+    - name: filePath
+      value: clusters/server/dev/server-deploy.yaml
+    - name: yamlField
+      value: spec.template.spec.containers[0].image
+  serviceAccountName: pipeline-account
+  workspaces:
+    - name: git-source
+      persistentVolumeClaim:
+        claimName: git-source-pvc
+EOF
+```
+
+```sh
+cat <<EOF | kubectl create -f -
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: build-and-deploy-prod-1
+spec:
+  pipelineRef:
+    name: build-and-deploy-pipeline
+  params:
+    - name: gitUrl
+      value: https://github.com/ricoberger/gitops-using-argo-cd-and-tekton
+    - name: gitRevision
+      value: main
+    - name: imageUrl
+      value: ricoberger/gitops-using-argo-cd-and-tekton
+    - name: imageTag
+      value: main
+    - name: serviceName
+      value: server
+    - name: filePath
+      value: clusters/server/prod/server-deploy.yaml
+    - name: yamlField
+      value: spec.template.spec.containers[0].image
+  serviceAccountName: pipeline-account
+  workspaces:
+    - name: git-source
+      persistentVolumeClaim:
+        claimName: git-source-pvc
+EOF
+```

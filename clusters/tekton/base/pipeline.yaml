@@ -1,0 +1,68 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-pipeline
+  namespace: tekton-pipelines
+spec:
+  workspaces:
+    - name: git-source
+      description: Git repository
+  params:
+    - name: gitUrl
+      description: Git repository url
+    - name: gitRevision
+      description: Git revision to check out
+      default: master
+    - name: pathToContext
+      description: The path to the build context, used by Kaniko - within the workspace
+      default: gitops-using-argo-cd-and-tekton
+    - name: imageUrl
+      description: Image name including repository
+    - name: serviceName
+      description: Name of the service which is updated
+    - name: filePath
+      description: Path to the yaml file which should be updated
+    - name: yamlField
+      description: Field which should be updated
+  tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: url
+          value: "$(params.gitUrl)"
+        - name: revision
+          value: "$(params.gitRevision)"
+    - name: source-to-image
+      taskRef:
+        name: kaniko
+      runAfter:
+        - clone-repo
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: CONTEXT
+          value: $(params.pathToContext)
+        - name: IMAGE
+          value: $(params.imageUrl):$(params.gitRevision)-$(tasks.clone-repo.results.commit)
+    - name: update-image
+      taskRef:
+        name: update-image
+      runAfter:
+        - source-to-image
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: SERVICE_NAME
+          value: $(params.serviceName)
+        - name: FILE_PATH
+          value: $(params.filePath)
+        - name: YAML_FIELD
+          value: $(params.yamlField)
+        - name: IMAGE
+          value: $(params.imageUrl):$(params.gitRevision)-$(tasks.clone-repo.results.commit)

@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  workspaces:
+    - name: source
+      description: The git repo will be cloned onto the volume backing this workspace
+  params:
+    - name: url
+      description: git url to clone
+      type: string
+    - name: revision
+      description: git revision to checkout (branch, tag, sha, ref…)
+      type: string
+      default: main
+  results:
+    - name: commit
+      description: The precise commit SHA that was fetched by this Task
+  steps:
+    - name: git-clone
+      image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.12.1
+      securityContext:
+        privileged: true
+      script: |
+        cd $(workspaces.source.path)
+        rm -rf gitops-using-argo-cd-and-tekton
+        git clone -b "$(params.revision)" "$(params.url)"
+        cd gitops-using-argo-cd-and-tekton
+        RESULT_SHA="$(git rev-parse HEAD)"
+        echo -n "$RESULT_SHA" > $(results.commit.path)
