@@ -102,8 +102,6 @@ spec:
       value: dev
     - name: imageUrl
       value: ricoberger/gitops-using-argo-cd-and-tekton
-    - name: imageTag
-      value: dev
     - name: serviceName
       value: server
     - name: filePath
@@ -136,8 +134,6 @@ spec:
       value: main
     - name: imageUrl
       value: ricoberger/gitops-using-argo-cd-and-tekton
-    - name: imageTag
-      value: main
     - name: serviceName
       value: server
     - name: filePath
