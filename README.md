@@ -1,6 +1,8 @@
 # GitOps using Argo CD and Tekton
 
-This repository demonstrates the GitOps workflow using [Argo CD](https://argoproj.github.io/projects/argo-cd) and [Tekton](https://tekton.dev). Argo CD is used to deploy our manifests to a Kubernetes cluster and Tekton is used for our CI/CD pipeline to build and update our applications.
+This repository demonstrates a possible GitOps workflow using [Argo CD](https://argoproj.github.io/projects/argo-cd) and [Tekton](https://tekton.dev). We are using Argo CD to setup our Kubernetes clusters `dev` and `prod` (in the following we will only use the `dev` cluster) and Tekton to build and update our example application.
+
+![GitOps](./assets/gitops.png)
 
 ## Argo CD
 
@@ -69,6 +71,8 @@ In the next step we can login to Grafana with the `admin` user and the password 
 >
 > We had to remove the `preserveUnknownFields` field from all CRDs and we had to change the `app.kubernetes.io/instance` label from `default` to `tekton` for all manifests.
 
+We are using Tekton Pipelines to build our example application and to update the deployed Docker image. The required tasks and pipelines are deployed by Argo CD, but we have to manually provide the credentials for Docker Hub and GitHub. To create the secrets we have to run the following commands:
+
 ```sh
 kubectl create secret docker-registry docker-registry-secret --docker-server="https://index.docker.io/v1/" --docker-username=<DOCKER_USERNAME> --docker-password=<DOCKER_PASSWORD>
 kubectl annotate secret docker-registry-secret tekton.dev/docker-0=https://index.docker.io/v1/
@@ -76,12 +80,18 @@ kubectl create secret generic github-secret --type="kubernetes.io/basic-auth" --
 kubectl annotate secret github-secret tekton.dev/git-0=https://github.com
 ```
 
+> In a production ready setup, we should use the [Vault Secrets Operator](https://github.com/ricoberger/vault-secrets-operator) or a similar tool to manage our secrets.
+
+When we have created the secrets, we can run our pipeline, to build a new Docker image for the development and production environment:
+
 ```sh
 cat <<EOF | kubectl create -f -
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   name: build-and-deploy-dev-1
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   pipelineRef:
     name: build-and-deploy-pipeline
@@ -114,6 +124,8 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   name: build-and-deploy-prod-1
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   pipelineRef:
     name: build-and-deploy-pipeline
@@ -139,3 +151,31 @@ spec:
         claimName: git-source-pvc
 EOF
 ```
+
+Now we can visit [tekton-dev.fake](http://tekton-dev.fake/#/namespaces/tekton-pipelines/pipelineruns) to see the results of our above pipeline runs.
+
+![Tekton](./assets/tekton.png)
+
+When the pipeline ran successfully, we can also watch the Pods in the `server` Namespace, were we can see that our example application is automatically updated after some time:
+
+```sh
+k get pods -w --namespace server
+```
+
+```txt
+NAME                     READY   STATUS    RESTARTS   AGE
+server-cbfbc758f-7w6lx   1/1     Running   0          14s
+server-cbfbc758f-7w6lx   1/1     Terminating   0          24s
+server-cbfbc758f-7w6lx   0/1     Terminating   0          25s
+server-cbfbc758f-7w6lx   0/1     Terminating   0          26s
+server-cbfbc758f-7w6lx   0/1     Terminating   0          26s
+server-5b5c778558-2krtw   0/1     Pending       0          0s
+server-5b5c778558-2krtw   0/1     Pending       0          0s
+server-5b5c778558-2krtw   0/1     ContainerCreating   0          0s
+server-5b5c778558-2krtw   0/1     Running             0          1s
+server-5b5c778558-2krtw   1/1     Running             0          8s
+```
+
+We can also visit [server-dev.fake](http://server-dev.fake/) were we should see the greeting `Hello World`. When we change line 25 in the `cmd/server/server.go` file and merge our changes to the `dev` branch and rerun our pipeline, we should also see an updated greeting.
+
+Instead of manually running our pipeline, we can also use [Tekton Triggers](https://github.com/tektoncd/triggers) in the future to run our pipeline on each commit to the `dev` and `main` branch.
