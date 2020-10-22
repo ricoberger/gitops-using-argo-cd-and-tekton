@@ -12,7 +12,7 @@ spec:
       description: Git repository url
     - name: gitRevision
       description: Git revision to check out
-      default: master
+      default: main
     - name: pathToContext
       description: The path to the build context, used by Kaniko - within the workspace
       default: gitops-using-argo-cd-and-tekton
@@ -33,9 +33,9 @@ spec:
           workspace: git-source
       params:
         - name: url
-          value: "$(params.gitUrl)"
+          value: $(params.gitUrl)
         - name: revision
-          value: "$(params.gitRevision)"
+          value: $(params.gitRevision)
     - name: source-to-image
       taskRef:
         name: kaniko
